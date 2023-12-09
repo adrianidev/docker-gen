@@ -57,3 +57,13 @@ check-gofmt:
 
 test:
 	go test -race ./internal/...
+
+docker-build: dist
+	docker build -t adrianidev/docker-gen:$(VERSION)-amd64 --build-arg ARCH=amd64 --build-arg GOARCH=amd64 -f Dockerfile.alpine .
+	docker build -t adrianidev/docker-gen:$(VERSION)-arm64v8 --build-arg ARCH=arm64v8 --build-arg GOARCH=arm64 -f Dockerfile.alpine .
+	docker build -t adrianidev/docker-gen:$(VERSION)-debian-amd64 --build-arg ARCH=amd64 --build-arg  GOARCH=amd64 -f Dockerfile.debian .
+	docker build -t adrianidev/docker-gen:$(VERSION)-debian-arm64v8 --build-arg ARCH=arm64v8 --build-arg  GOARCH=arm64 -f Dockerfile.debian .
+
+docker-manifest:
+	docker manifest create adrianidev/docker-gen:$(VERSION) --amend adrianidev/docker-gen:$(VERSION)-arm64v8 --amend adrianidev/docker-gen:$(VERSION)-amd64
+	docker manifest create adrianidev/docker-gen:$(VERSION)-debian --amend adrianidev/docker-gen:$(VERSION)-debian-arm64v8 --amend adrianidev/docker-gen:$(VERSION)-debian-amd64
